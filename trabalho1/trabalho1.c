@@ -91,12 +91,122 @@ int teste(int a)
  */
 int q1(char data[])
 {
-  int datavalida = 1;
+   int datavalida = 1;
+  int dia = 0;
+  int mes = 0;
+  int ano = 0;
+  int barra1 = -1, barra2 = -1;
+  int i, j;
+
+  int tamanho = strlen(data);
 
   //quebrar a string data em strings sDia, sMes, sAno
+  
+  for (i = 0; i < tamanho; i++) {
+        if (data[i] == '/') {
+            if (barra1 == -1)
+                barra1 = i;
+            else if (barra2 == -1)
+                barra2 = i;
+            else
+                return 0; 
+        }
+    }
+      
+    for(i=0;data[i] != '/';i++){
+    }
 
+    if(data[0]>= '0' && data[0]<= '9'){
+        if(data[0]== '0' && (data[1]>= '0' && data[1]<='9')){
+            dia = data[1]-'0';
+        }
+        else if(data[1] == '/'){
+            dia = data[0]-'0';}
+        else if(data[0]!= '0' && (data[1]>= '0' && data[1]<= '9')){
+            dia = data[0]-'0';
+            dia = dia*10;
+            dia = dia + data[1]-'0';
+        }
+    }
+    else{ datavalida = 0;
+        }
+    
+    
+   if(dia<=0 || dia>31){
+        datavalida = 0;
+        
+    }
+        
+      
+    i++;
+    
+    if(data[i]>= '0' && data[i]<= '9'){
+        if(data[i]== '0' && (data[i+1]>= '0' && data[i+1]<= '9')){
+            mes = data[i+1]-'0';
+        }
+        else if(data[i+1] == '/'){
+            mes = data[i]-'0';}
+        else if(data[i]!= '0' && (data[i+1]>= '0' && data[i+1]<='9')){
+            mes = data[i]-'0';
+            mes = mes*10;
+            mes = mes + data[i+1]-'0';
+        }
+         else{ datavalida = 0;
+                }
+        }
+        
+    
+    if(mes<=0 || mes>12){
+    datavalida = 0;
+    }
+    
+    int mult = 10;
+ 
+    j = tamanho-(barra2+1);
+  
+   if(j==2){
+   for(i=barra2+1, ano = 2000, mult=10;i<tamanho;i++){
+       ano += (data[i]-'0')*mult;
+       mult /=10;
+      }
+    }
+    if(j == 4){
+        for(i=barra2+1, mult=1000;i<tamanho;i++){
+       ano += (data[i]-'0')*mult;
+       mult /=10;
+      }
+    }
+    
+    
+    
+    if(ano>2025){
+        datavalida = 0;
+        
+    }
 
-  //printf("%s\n", data);
+    if(mes == 2){
+        if((ano % 400 == 0) || (ano % 4 == 0 && ano % 100 != 0)){
+            if(dia>29){
+                datavalida = 0;
+            }
+        }
+        else if(dia>28){
+            datavalida = 0;
+        }
+        }
+    else if(mes == 4 || mes == 6 || mes == 9 || mes == 11){
+        if(dia>30){
+                datavalida = 0;
+               
+        }
+    }
+    else if(mes == 1 || mes == 3 || mes == 5 || mes == 7 || mes == 8 || mes == 10 || mes == 12){
+        if(dia>31){
+                datavalida = 0;
+                
+        }
+    }
+
 
   if (datavalida)
       return 1;
