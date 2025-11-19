@@ -1,0 +1,8 @@
+{
+    "code-runner.runInTerminal": true,
+    "code-runner.executorMap": {
+        "c": "cd \"$dir\" && gcc \"$fileName\" -o \"$fileNameWithoutExt.exe\" && \"$dir\\$fileNameWithoutExt.exe\""
+    },
+    "C_Cpp.default.compilerPath": "C:/TDM-GCC-64/bin/gcc.exe",
+    "files.autoSave": "afterDelay"
+}
