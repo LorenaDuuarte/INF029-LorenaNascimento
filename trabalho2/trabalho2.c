@@ -4,7 +4,13 @@
 
 #include "trabalho2.h"
 
-int vetorPrincipal[TAM];
+typedef struct {
+    int *valor;
+    int qtd;
+    int tamanho;
+} AUX;
+
+AUX vetorPrincipal[TAM];
 
 /*
 Objetivo: criar estrutura auxiliar na posição 'posicao'.
@@ -21,18 +27,33 @@ int criarEstruturaAuxiliar(int posicao, int tamanho)
 {
 
     int retorno = 0;
-    // a posicao pode já existir estrutura auxiliar
-    retorno = JA_TEM_ESTRUTURA_AUXILIAR;
+    
     // se posição é um valor válido {entre 1 e 10}
-    retorno = POSICAO_INVALIDA;
-    // o tamanho ser muito grande
-    retorno = SEM_ESPACO_DE_MEMORIA;
+    if(posicao<1 || posicao>10){
+        return POSICAO_INVALIDA;
+    }
     // o tamanho nao pode ser menor que 1
-    retorno = TAMANHO_INVALIDO;
+    else if(tamanho<1){
+    return TAMANHO_INVALIDO;
+    }
+    // a posicao pode já existir estrutura auxiliar
+    if(vetorPrincipal[posicao].valor != NULL){
+    return JA_TEM_ESTRUTURA_AUXILIAR;
+    }
+    // o tamanho ser muito grande
+    vetorPrincipal[posicao].valor = malloc(tamanho * sizeof(int));
+    if (vetorPrincipal[posicao].valor == NULL) {
+        return SEM_ESPACO_DE_MEMORIA;
+    }
+    
     // deu tudo certo, crie
-    retorno = SUCESSO;
-
-    return retorno;
+    else {
+    vetorPrincipal[posicao].qtd = 0;
+    vetorPrincipal[posicao].tamanho = tamanho;
+    
+     return SUCESSO;
+    }
+   
 }
 
 /*
@@ -51,6 +72,18 @@ int inserirNumeroEmEstrutura(int posicao, int valor)
     int temEspaco = 0;
     int posicao_invalida = 0;
 
+    (posicao < 1 || posicao > TAM) ? (posicao_invalida = 1) : (posicao_invalida = 0);
+
+    if (!posicao_invalida)
+    {
+        existeEstruturaAuxiliar = (vetorPrincipal[posicao-1].valor != NULL);
+
+        if (existeEstruturaAuxiliar)
+        {
+            temEspaco = (vetorPrincipal[posicao-1].qtd < vetorPrincipal[posicao-1].tamanho);
+        }
+    }
+
     if (posicao_invalida)
         retorno = POSICAO_INVALIDA;
     else
@@ -61,6 +94,8 @@ int inserirNumeroEmEstrutura(int posicao, int valor)
             if (temEspaco)
             {
                 //insere
+                vetorPrincipal[posicao-1].valor[vetorPrincipal[posicao-1].qtd] = valor;
+                vetorPrincipal[posicao-1].qtd++;
                 retorno = SUCESSO;
             }
             else
@@ -91,6 +126,20 @@ Rertono (int)
 int excluirNumeroDoFinaldaEstrutura(int posicao)
 {
     int retorno = SUCESSO;
+
+    int idx = posicao - 1;
+
+    if (posicao < 1 || posicao > TAM)
+        return POSICAO_INVALIDA;
+
+    if (vetorPrincipal[idx].valor == NULL)
+        return SEM_ESTRUTURA_AUXILIAR;
+
+    if (vetorPrincipal[idx].qtd == 0)
+        return ESTRUTURA_AUXILIAR_VAZIA;
+
+    vetorPrincipal[idx].qtd--;
+
     return retorno;
 }
 
@@ -110,13 +159,42 @@ Rertono (int)
 int excluirNumeroEspecificoDeEstrutura(int posicao, int valor)
 {
     int retorno = SUCESSO;
-    return retorno;
+    int retorno = ehPosicaoValida(posicao);
+    if (retorno != SUCESSO)
+        return POSICAO_INVALIDA;
+    int idx = posicao - 1;
+    if (vetorPrincipal[idx].valor == NULL)
+        return SEM_ESTRUTURA_AUXILIAR;
+    if (vetorPrincipal[idx].qtd == 0)
+        return ESTRUTURA_AUXILIAR_VAZIA;
+
+    int encontrado = 0;
+    for (int i = 0; i < vetorPrincipal[idx].qtd; i++)
+    {
+        if (vetorPrincipal[idx].valor[i] == valor)
+        {
+            encontrado = 1;
+            for (int j = i; j < vetorPrincipal[idx].qtd - 1; j++)
+            {
+                vetorPrincipal[idx].valor[j] = vetorPrincipal[idx].valor[j + 1];
+            }
+            vetorPrincipal[idx].qtd--;
+            break;
+        }
+    }
+    
+    if (!encontrado)
+        return NUMERO_INEXISTENTE;
+
+
+    return SUCESSO;
 }
 
 // se posição é um valor válido {entre 1 e 10}
 int ehPosicaoValida(int posicao)
 {
     int retorno = 0;
+    
     if (posicao < 1 || posicao > 10)
     {
         retorno = POSICAO_INVALIDA;
@@ -137,10 +215,19 @@ Retorno (int)
 */
 int getDadosEstruturaAuxiliar(int posicao, int vetorAux[])
 {
+  if (posicao < 1 || posicao > TAM)
+        return POSICAO_INVALIDA;
+  int idx = posicao - 1;
 
-    int retorno = 0;
+    if (vetorPrincipal[idx].valor == NULL)
+        return SEM_ESTRUTURA_AUXILIAR;
 
-    return retorno;
+    for (int i = 0; i < vetorPrincipal[idx].qtd; i++)
+    {
+        vetorAux[i] = vetorPrincipal[idx].valor[i];
+    }
+
+    return SUCESSO;
 }
 
 /*
@@ -154,11 +241,31 @@ Rertono (int)
 */
 int getDadosOrdenadosEstruturaAuxiliar(int posicao, int vetorAux[])
 {
+    if (posicao < 1 || posicao > TAM)
+            return POSICAO_INVALIDA;
+    int idx = posicao - 1;
+    if (vetorPrincipal[idx].valor == NULL)
+        return SEM_ESTRUTURA_AUXILIAR;
+    for (int i = 0; i < vetorPrincipal[idx].qtd; i++)
+    {
+        vetorAux[i] = vetorPrincipal[idx].valor[i];
+    }
 
-    int retorno = 0;
+    // ordenar o vetorAux
+    for (int i = 0; i < vetorPrincipal[idx].qtd - 1; i++)
+    {
+        for (int j = 0; j < vetorPrincipal[idx].qtd - i - 1; j++)
+        {
+            if (vetorAux[j] > vetorAux[j + 1])
+            {
+                int temp = vetorAux[j];
+                vetorAux[j] = vetorAux[j + 1];
+                vetorAux[j + 1] = temp;
+            }
+        }
+    }               
 
-    
-    return retorno;
+    return SUCESSO;
 }
 
 /*
@@ -171,9 +278,27 @@ Rertono (int)
 */
 int getDadosDeTodasEstruturasAuxiliares(int vetorAux[])
 {
+    int pos = 0;
+    int vazias = 1;
 
-    int retorno = 0;
-    return retorno;
+    for (int i = 0; i < TAM; i++)
+    {
+        if (vetorPrincipal[i].valor != NULL && vetorPrincipal[i].qtd > 0)
+        {
+            vazias = 0;
+            for (int j = 0; j < vetorPrincipal[i].qtd; j++)
+            {
+                vetorAux[pos] = vetorPrincipal[i].valor[j];
+                pos++;
+            }
+        }
+    }
+
+    if (vazias)
+        return TODAS_ESTRUTURAS_AUXILIARES_VAZIAS;
+
+    
+    return SUCESSO;
 }
 
 /*
@@ -186,9 +311,40 @@ Rertono (int)
 */
 int getDadosOrdenadosDeTodasEstruturasAuxiliares(int vetorAux[])
 {
+    int pos = 0;
+    int vazias = 1;
 
-    int retorno = 0;
-    return retorno;
+    for (int i = 0; i < TAM; i++)
+    {
+        if (vetorPrincipal[i].valor != NULL && vetorPrincipal[i].qtd > 0)
+        {
+            vazias = 0;
+            for (int j = 0; j < vetorPrincipal[i].qtd; j++)
+            {
+                vetorAux[pos] = vetorPrincipal[i].valor[j];
+                pos++;
+            }
+        }
+    }
+    if (vazias)
+        return TODAS_ESTRUTURAS_AUXILIARES_VAZIAS;
+
+    // ordenar o vetorAux
+    for (int i = 0; i < pos - 1; i++)
+    {
+        for (int j = 0; j < pos - i - 1; j++)
+        {
+            if (vetorAux[j] > vetorAux[j + 1])
+            {
+                int temp = vetorAux[j];
+                vetorAux[j] = vetorAux[j + 1];
+                vetorAux[j + 1] = temp;
+            }
+        }
+    }
+    
+
+    return SUCESSO;
 }
 
 /*
@@ -204,9 +360,34 @@ Rertono (int)
 */
 int modificarTamanhoEstruturaAuxiliar(int posicao, int novoTamanho)
 {
+    if (posicao < 1 || posicao > TAM)
+        return POSICAO_INVALIDA;
+    int idx = posicao - 1;
 
-    int retorno = 0;
-    return retorno;
+    if (vetorPrincipal[idx].valor == NULL)
+        return SEM_ESTRUTURA_AUXILIAR;
+
+    if (novoTamanho < 0)
+        return NOVO_TAMANHO_INVALIDO;
+
+    int tamanhoAtual = vetorPrincipal[idx].tamanho;
+    int tamanhoResultante = tamanhoAtual + novoTamanho;
+
+    if (tamanhoResultante < 1)
+        return NOVO_TAMANHO_INVALIDO;
+
+    int *novoVetor = realloc(vetorPrincipal[idx].valor, tamanhoResultante * sizeof(int));
+    if (novoVetor == NULL)
+        return SEM_ESPACO_DE_MEMORIA;
+    vetorPrincipal[idx].valor = novoVetor;
+    vetorPrincipal[idx].tamanho = tamanhoResultante;
+
+    if (vetorPrincipal[idx].qtd > tamanhoResultante)
+    {
+        vetorPrincipal[idx].qtd = tamanhoResultante;
+    }
+    
+    return SUCESSO;
 }
 
 /*
@@ -219,15 +400,26 @@ Retorno (int)
     Um número int > 0 correpondente a quantidade de elementos preenchidos da estrutura
 */
 int getQuantidadeElementosEstruturaAuxiliar(int posicao)
-{
+{   
+    if (posicao < 1 || posicao > TAM)
+        return POSICAO_INVALIDA;
+    int idx = posicao - 1;
 
-    int retorno = 0;
+    if (vetorPrincipal[idx].valor == NULL)
+        return SEM_ESTRUTURA_AUXILIAR;
 
-    return retorno;
+    if (vetorPrincipal[idx].qtd == 0)
+        return ESTRUTURA_AUXILIAR_VAZIA;
+
+
+   return vetorPrincipal[idx].qtd;
+
 }
 
 /*
 Objetivo: montar a lista encadeada com cabeçote com todos os números presentes em todas as estruturas.
+
+// ate aqui!!
 
 Retorno (No*)
     NULL, caso não tenha nenhum número nas listas
