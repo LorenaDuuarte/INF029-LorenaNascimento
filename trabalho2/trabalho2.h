@@ -32,4 +32,4 @@ void inicializar();
 void finalizar();
 void dobrar(int *x);
 
-#endif  // TRABALHO2_ESTRUTURAVETORES_H
+#endif   //TRABALHO2_ESTRUTURAVETORES_H
